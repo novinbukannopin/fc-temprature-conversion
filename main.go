@@ -2,71 +2,112 @@ package main
 
 import "fmt"
 
-func main() {
-	fmt.Println("Masukkan kalkulator suhu yang ingin digunakan : ")
-	fmt.Println("1. Celcius ke Fahrenheit")
-	fmt.Println("2. Celcius ke Kelvin")
-	fmt.Println("3. Fahrenheit ke Celcius")
-	fmt.Println("4. Fahrenheit ke Kelvin")
-	fmt.Println("5. Kelvin ke Celcius")
-	fmt.Println("6. Kelvin ke Fahrenheit")
-	fmt.Println("Pilih angka 1-6 : ")
+type celcius struct {
+	value float64
+}
 
-	var option int
-	fmt.Scanf("%d", &option)
-	for option < 1 || option > 6 {
-		fmt.Println("Pilihan tidak valid, silahkan pilih angka 1-6 : ")
-		fmt.Scanf("%d", &option)
+type fahrenheit struct {
+	value float64
+}
+
+type kelvin struct {
+	value float64
+}
+
+func (c celcius) toFahrenheit() float64 {
+	return ((9.0 / 5.0) * c.value) + 32
+}
+
+func (c celcius) toKelvin() float64 {
+	return c.value + 273.15
+}
+
+func (c celcius) toCelcius() float64 {
+	return c.value
+}
+
+func (f fahrenheit) toCelcius() float64 {
+	return (f.value - 32) * (5.0 / 9.0)
+}
+
+func (f fahrenheit) toKelvin() float64 {
+	return (f.value + 459.67) * (5.0 / 9.0)
+}
+
+func (f fahrenheit) toFahrenheit() float64 {
+	return f.value
+}
+
+func (k kelvin) toCelcius() float64 {
+	return k.value - 273.15
+}
+
+func (k kelvin) toFahrenheit() float64 {
+	return (k.value * (9.0 / 5.0)) - 459.67
+}
+
+func (k kelvin) toKelvin() float64 {
+	return k.value
+}
+
+type calculateTemprature interface {
+	toFahrenheit() float64
+	toKelvin() float64
+	toCelcius() float64
+}
+
+func main() {
+	fmt.Println("Temprature Conversion")
+	fmt.Println("1. Celcius")
+	fmt.Println("2. Fahrenheit")
+	fmt.Println("3. Kelvin")
+	fmt.Println("Enter the temprature value:")
+
+	var firstOption uint64
+	fmt.Scanf("%d", &firstOption)
+
+	for firstOption < 1 || firstOption > 3 {
+		fmt.Println("Invalid value. Please enter valid value")
+		fmt.Scanf("%d", &firstOption)
+	}
+
+	fmt.Println("Insert option to convert to:")
+	fmt.Println("1. Celcius")
+	fmt.Println("2. Fahrenheit")
+	fmt.Println("3. Kelvin")
+	fmt.Println("Enter the option value (1-3):")
+
+	var secondOption uint64
+	fmt.Scanf("%d", &secondOption)
+
+	for secondOption < 1 || secondOption > 3 {
+		fmt.Println("Invalid value. Please enter valid value")
+		fmt.Scanf("%d", &secondOption)
 	}
 
 	var value float64
-	fmt.Println("Masukkan nilai suhu : ")
+	fmt.Println("Enter the temprature value:")
 	fmt.Scanf("%f", &value)
 
-	var result float64
-	if option == 1 {
-		result = CelciusToFahrenheit(value)
-	} else if option == 2 {
-		result = CelciusToKelvin(value)
-	} else if option == 3 {
-		result = FahrenheitToCelcius(value)
-	} else if option == 4 {
-		result = FahrenheitToKelvin(value)
-	} else if option == 5 {
-		result = KelvinToCelcius(value)
-	} else {
-		result = KelvinToFahrenheit(value)
+	var interfaceValue calculateTemprature
+	switch firstOption {
+	case 1:
+		interfaceValue = celcius{value}
+	case 2:
+		interfaceValue = fahrenheit{value}
+	case 3:
+		interfaceValue = kelvin{value}
 	}
 
-	fmt.Printf("Hasil konversi suhu adalah : %.2f\n", result)
-}
+	var result float64
+	switch secondOption {
+	case 1:
+		result = interfaceValue.toCelcius()
+	case 2:
+		result = interfaceValue.toFahrenheit()
+	case 3:
+		result = interfaceValue.toKelvin()
+	}
 
-func CelciusToFahrenheit(c float64) float64 {
-	f := (9.0 / 5.0 * c) + 32
-	return f
-}
-
-func CelciusToKelvin(c float64) float64 {
-	k := c + 273.15
-	return k
-}
-
-func FahrenheitToCelcius(f float64) float64 {
-	c := (f - 32.0) * 5 / 9
-	return c
-}
-
-func FahrenheitToKelvin(f float64) float64 {
-	k := (f + 459.67) * (5 / 9)
-	return k
-}
-
-func KelvinToCelcius(k float64) float64 {
-	c := k - 273.15
-	return c
-}
-
-func KelvinToFahrenheit(k float64) float64 {
-	f := (k * (5 / 9)) - 459.67
-	return f
+	fmt.Println("Result:", result)
 }
